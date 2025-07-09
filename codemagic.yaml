@@ -7,7 +7,7 @@ workflows:
       node: 16.13.0
       java: 17 
       vars:
-        PACKAGE_NAME: "com.slivki-shop.ru"
+        PACKAGE_NAME: "com.SlivkiShop.ru"
       groups:
         # Используем предустановленную группу для подписи Android-приложений
         - Android code signing
