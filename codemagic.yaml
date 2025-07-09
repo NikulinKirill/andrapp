@@ -1,0 +1,135 @@
+workflows:
+  android-workflow:
+    name: Android Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      node: 16.13.0
+      java: 17 
+      vars:
+        PACKAGE_NAME: "com.slivki-shop.ru"
+      groups:
+        # Используем предустановленную группу для подписи Android-приложений
+        - Android code signing
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install -g cordova
+          npm install
+      
+      - name: Setup Android SDK
+        script: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platforms;android-34"
+      
+      - name: Setup Keystore
+        script: |
+          # Создаем директорию для keystore файла, если она не существует
+          mkdir -p $(dirname "$KEYSTORE_PATH")
+          
+          # Декодируем base64 из KEYSTORE_FILE в путь, указанный в KEYSTORE_PATH
+          echo $KEYSTORE_FILE | base64 --decode > $KEYSTORE_PATH
+          
+          # Проверяем, что файл keystore создан успешно
+          if [ -f "$KEYSTORE_PATH" ]; then
+            echo "Keystore file successfully created at: $KEYSTORE_PATH"
+            file $KEYSTORE_PATH
+            ls -la $KEYSTORE_PATH
+          else
+            echo "ERROR: Failed to create keystore file at path: $KEYSTORE_PATH"
+            exit 1
+          fi
+      
+      - name: Add Android Platform
+        script: |
+          cordova platform add android
+      
+      - name: Create Signing Configuration
+        script: |
+          # Создаем build.json с конфигурацией подписи для ОБОИХ типов сборки
+          cat > build.json << EOF
+          {
+            "android": {
+              "debug": {
+                "keystore": "$KEYSTORE_PATH",
+                "storePassword": "$KEYSTORE_PASSWORD",
+                "alias": "$KEY_ALIAS",
+                "password": "$KEY_PASSWORD",
+                "keystoreType": "jks"
+              },
+              "release": {
+                "keystore": "$KEYSTORE_PATH",
+                "storePassword": "$KEYSTORE_PASSWORD",
+                "alias": "$KEY_ALIAS",
+                "password": "$KEY_PASSWORD",
+                "keystoreType": "jks"
+              }
+            }
+          }
+          EOF
+          
+          # Выводим содержимое build.json для отладки (без чувствительных данных)
+          echo "Build.json created with signing configuration for both debug and release builds"
+          
+          # Проверяем существование build.json
+          if [ -f "build.json" ]; then
+            echo "✅ build.json успешно создан"
+          else
+            echo "❌ ОШИБКА: build.json не создан"
+            exit 1
+          fi
+      
+      - name: Build Debug APK
+        script: |
+          # Используем build.json для подписи debug сборки тем же ключом
+          cordova build android --debug --buildConfig=build.json --verbose
+      
+      - name: Build Release APK and AAB
+        script: |
+          # Используем build.json для подписи release сборки
+          cordova build android --release --buildConfig=build.json --verbose
+      
+      - name: Display Build Output and Verification
+        script: |
+          echo "Debug APK:"
+          ls -la platforms/android/app/build/outputs/apk/debug/ || echo "Debug APK directory not found"
+          
+          echo "Release APK:"
+          ls -la platforms/android/app/build/outputs/apk/release/ || echo "Release APK directory not found"
+          
+          echo "Release Bundle (AAB):"
+          ls -la platforms/android/app/build/outputs/bundle/release/ || echo "AAB directory not found"
+          
+          # Проверка подписи APK для дебаг и релиз версий
+          echo "Verifying APK signatures match:"
+          if [ -f "platforms/android/app/build/outputs/apk/debug/app-debug.apk" ] && [ -f "platforms/android/app/build/outputs/apk/release/app-release.apk" ]; then
+            DEBUG_SIGNATURE=$(keytool -printcert -jarfile platforms/android/app/build/outputs/apk/debug/app-debug.apk | grep "SHA256" | head -1)
+            RELEASE_SIGNATURE=$(keytool -printcert -jarfile platforms/android/app/build/outputs/apk/release/app-release.apk | grep "SHA256" | head -1)
+            
+            echo "Debug signature: $DEBUG_SIGNATURE"
+            echo "Release signature: $RELEASE_SIGNATURE"
+            
+            if [ "$DEBUG_SIGNATURE" = "$RELEASE_SIGNATURE" ]; then
+              echo "✅ Signatures match! APKs are signed with the same key."
+            else
+              echo "❌ WARNING: Signatures don't match! Debug and release APKs are signed with different keys."
+            fi
+          else
+            echo "Cannot verify signatures: one or both APK files not found"
+          fi
+    
+    artifacts:
+      - platforms/android/app/build/outputs/apk/debug/app-debug.apk
+      - platforms/android/app/build/outputs/apk/release/app-release.apk
+      - platforms/android/app/build/outputs/bundle/release/app-release.aab
+      - build.json
+      - platforms/android/app/build/reports/**/*.html
+    
+    publishing:
+      email:
+        recipients:
+          - user@example.com
+      scripts:
+        - name: Version Info
+          script: |
+            VERSION=$(grep -o 'version="[^"]*"' config.xml | cut -d'"' -f2)
+            echo "Собрана версия $VERSION приложения $PACKAGE_NAME"

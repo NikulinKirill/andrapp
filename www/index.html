@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline' http://slivki-shop.ru https://slivki-shop.ru; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+    <title>SlivkiShop - маркетплейс оптовых закупок</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        #loader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #ff9b00;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #offline-page {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 900;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #offline-page img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        #offline-page h2 {
+            color: #ff9b00;
+            margin-bottom: 10px;
+        }
+        #offline-page p {
+            color: #333333;
+            margin-bottom: 20px;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+        #retry-button {
+            background-color: #ff9b00;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="offline-page">
+        <div style="width: 72px; height: 72px; margin-bottom: 20px;">
+            <img src="img/logo_small.png" alt="SlivkiShop" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <h2>Нет подключения к интернету</h2>
+        <p>Для работы с приложением SlivkiShop требуется подключение к интернету. Пожалуйста, проверьте ваше соединение и попробуйте снова.</p>
+        <button id="retry-button">Повторить попытку</button>
+    </div>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('deviceready', onDeviceReady, false);
+
+        function onDeviceReady() {
+            // Показываем загрузчик
+            document.getElementById('loader').style.display = 'flex';
+            
+            // Проверка соединения и загрузка контента
+            checkConnectionAndLoadContent();
+            
+            // Обработка кнопки "назад" на Android
+            document.addEventListener('backbutton', handleBackButton, false);
+            
+            // Обработчик кнопки повторной попытки
+            document.getElementById('retry-button').addEventListener('click', function() {
+                document.getElementById('offline-page').style.display = 'none';
+                document.getElementById('loader').style.display = 'flex';
+                // Проверяем соединение перед попыткой загрузки
+                checkConnectionAndLoadContent();
+            });
+
+            // Слушатель события изменения состояния сети
+            document.addEventListener("online", function() {
+                if (document.getElementById('offline-page').style.display === 'flex') {
+                    document.getElementById('offline-page').style.display = 'none';
+                    document.getElementById('loader').style.display = 'flex';
+                    // Загружаем последний известный URL
+                    loadWebsite(currentUrl);
+                }
+            }, false);
+
+            // Слушатель события потери соединения с сетью
+            document.addEventListener("offline", function() {
+                // Проверяем, открыт ли браузер
+                if (currentWebView) {
+                    // Закрываем браузер, если он открыт
+                    currentWebView.close();
+                    currentWebView = null;
+                }
+                // Показываем оффлайн страницу
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('offline-page').style.display = 'flex';
+            }, false);
+        }
+
+        function checkConnectionAndLoadContent() {
+            // Проверяем наличие соединения
+            var networkState = navigator.connection.type;
+            var isOffline = networkState === Connection.NONE;
+            
+            if (isOffline) {
+                // Если нет соединения, показываем оффлайн-страницу
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('offline-page').style.display = 'flex';
+            } else {
+                // Есть соединение, пробуем загрузить сайт (сохраняем начальный URL)
+                loadWebsite('https://slivki-shop.ru');
+            }
+        }
+
+        var currentWebView = null;
+        var currentUrl = 'https://slivki-shop.ru'; // Начальный URL по умолчанию
+        var isLoading = false; // Флаг для отслеживания процесса загрузки
+
+        function loadWebsite(url) {
+            // Если URL не передан, используем сохраненный или начальный
+            url = url || currentUrl;
+            
+            // Сохраняем текущий URL для возможного повторного использования
+            currentUrl = url;
+            
+            // Устанавливаем флаг загрузки
+            isLoading = true;
+            
+            // Если уже есть открытый WebView, закрываем его
+            if (currentWebView) {
+                currentWebView.close();
+                currentWebView = null;
+            }
+            
+            // Открываем сайт в InAppBrowser
+            var ref = cordova.InAppBrowser.open(url, '_blank', 'location=no,zoom=no,hidden=yes');
+            currentWebView = ref;
+            
+            // Таймаут для загрузки (если через 15 секунд не загрузилось - показываем оффлайн страницу)
+            var loadTimeout = setTimeout(function() {
+                if (isLoading) {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('offline-page').style.display = 'flex';
+                    
+                    if (ref) {
+                        ref.close();
+                        currentWebView = null;
+                    }
+                    isLoading = false;
+                }
+            }, 15000);
+            
+            ref.addEventListener('loadstop', function() {
+                // Загрузка завершена успешно
+                clearTimeout(loadTimeout);
+                isLoading = false;
+                
+                // Получаем текущий URL для сохранения
+                ref.executeScript(
+                    { code: "window.location.href" },
+                    function(result) {
+                        if (result && result[0]) {
+                            currentUrl = result[0];
+                        }
+                    }
+                );
+                
+                ref.show();
+                document.getElementById('loader').style.display = 'none';
+            });
+            
+            ref.addEventListener('loaderror', function(err) {
+                // Ошибка загрузки
+                clearTimeout(loadTimeout);
+                isLoading = false;
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('offline-page').style.display = 'flex';
+                
+                if (ref) {
+                    ref.close();
+                    currentWebView = null;
+                }
+            });
+
+            ref.addEventListener('exit', function() {
+                // При закрытии браузера проверяем состояние сети
+                if (navigator.connection.type === Connection.NONE) {
+                    // Если нет сети, показываем оффлайн страницу
+                    document.getElementById('offline-page').style.display = 'flex';
+                    currentWebView = null;
+                } else {
+                    // Если сеть есть, просто выходим из приложения
+                    currentWebView = null;
+                    navigator.app.exitApp();
+                }
+            });
+        }
+
+        function handleBackButton() {
+            if (document.getElementById('offline-page').style.display === 'flex') {
+                // Если мы на оффлайн странице, НЕ выходим из приложения
+                // Просто оставляем пользователя на оффлайн странице
+                return;
+            } else if (currentWebView) {
+                // Если открыт WebView, пробуем вернуться назад в истории
+                currentWebView.executeScript(
+                    { code: "if (window.history.length > 1) { history.go(-1); return window.location.href; } else { return false; }" },
+                    function(values) {
+                        if (values && values[0] === false) {
+                            navigator.app.exitApp();
+                        } else if (values && values[0]) {
+                            // Сохраняем новый URL после навигации назад
+                            currentUrl = values[0];
+                        }
+                    }
+                );
+            } else {
+                // Если ничего не открыто, выходим из приложения
+                navigator.app.exitApp();
+            }
+        }
+    </script>
+</body>
+</html>

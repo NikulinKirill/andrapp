@@ -1,0 +1,106 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cordova платформы (автоматически генерируются)
+platforms/
+
+# Cordova плагины (автоматически устанавливаются из config.xml)
+plugins/
+
+# Cordova hooks
+hooks/
+
+# Build артефакты
+build/
+dist/
+*.apk
+*.ipa
+*.app
+
+# IDE файлы
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS файлы
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Логи
+*.log
+logs/
+
+# Временные файлы
+tmp/
+temp/
+
+# Gradle (для Android)
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
+# Android Studio
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+
+# Конфигурационные файлы среды
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Кэш
+.cache/
+.parcel-cache/
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Исключения - файлы которые ДОЛЖНЫ быть в Git:
+!config.xml
+!package.json
+!package-lock.json
+!www/
+!res/
+!codemagic.yaml

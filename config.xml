@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.slivki-shop.ru" version="1.0.0" 
+        android-versionCode="10000" 
+        android-versionName="1.0.0" 
+        xmlns="http://www.w3.org/ns/widgets" 
+        xmlns:cdv="http://cordova.apache.org/ns/1.0" 
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>SlivkiShop</name>
+    <description>
+        Маркетплейс
+    </description>
+    <author email="info@dstglobal.ru" href="https://dstglobal.ru">
+        DST Global
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    
+    <!-- Настройки для сплэш-скрина -->
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="3000" />
+    <preference name="FadeSplashScreen" value="true" />
+    <preference name="FadeSplashScreenDuration" value="300" />
+    <preference name="AutoHideSplashScreen" value="true" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="SplashShowOnlyFirstTime" value="false" />
+    <preference name="SplashScreenSpinnerColor" value="#FFFFFF" />
+
+    <!-- Важные настройки для устранения черного фона -->
+    <preference name="BackgroundColor" value="#FFFFFF" />
+    <preference name="AndroidPersistentFileLocation" value="Internal" />
+    <preference name="android-windowSoftInputMode" value="adjustResize" />
+    <preference name="DisallowOverscroll" value="true" />
+    
+    <platform name="android">
+        <allow-intent href="market:*" />
+        <preference name="LoadUrlTimeoutValue" value="70000" />
+        <preference name="AndroidLaunchMode" value="singleTop" />
+        
+        <!-- Настройки для сплэш-скрина в Android 13 -->
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/res/splash/android/splash.png" />
+        <preference name="AndroidWindowSplashScreenIconBackgroundColor" value="#FFFFFF" />
+        <preference name="AndroidWindowSplashScreenBrandingImage" value="" />
+        
+        <!-- Иконки приложения -->
+        <icon density="ldpi" src="www/res/icon/android/icon-36-ldpi.png" />
+        <icon density="mdpi" src="www/res/icon/android/icon-48-mdpi.png" />
+        <icon density="hdpi" src="www/res/icon/android/icon-72-hdpi.png" />
+        <icon density="xhdpi" src="www/res/icon/android/icon-96-xhdpi.png" />
+        <icon density="xxhdpi" src="www/res/icon/android/icon-144-xxhdpi.png" />
+        <icon density="xxxhdpi" src="www/res/icon/android/icon-192-xxxhdpi.png" />
+    </platform>
+</widget>
