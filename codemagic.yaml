@@ -103,7 +103,7 @@ workflows:
           if [ -f "platforms/android/build/reports/problems/problems-report.html" ]; then
             echo "✅ Problems report найден: platforms/android/build/reports/problems/problems-report.html"
             echo "📄 Краткое содержимое отчета:"
-            head -100 platforms/android/build/reports/problems/problems-report.html || echo "Не удалось прочитать отчет"
+            head -10000 platforms/android/build/reports/problems/problems-report.html || echo "Не удалось прочитать отчет"
           else
             echo "Отчёт не найден"
           fi 
@@ -130,6 +130,7 @@ workflows:
       - platforms/android/app/build/outputs/apk/debug/app-debug.apk
       - platforms/android/app/build/outputs/apk/release/app-release.apk
       - platforms/android/app/build/outputs/bundle/release/app-release.aab
+      - platforms/android/build/reports/problems/problems-report.html
       - build.json
       - platforms/android/app/build/reports/**/*.html
     
