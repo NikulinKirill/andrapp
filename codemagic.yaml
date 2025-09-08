@@ -98,6 +98,15 @@ workflows:
           
           echo "Release Bundle (AAB):"
           ls -la platforms/android/app/build/outputs/bundle/release/ || echo "AAB directory not found"
+
+          echo "Проблемы gradle..."
+          if [ -f "platforms/android/build/reports/problems/problems-report.html" ]; then
+            echo "✅ Problems report найден: platforms/android/build/reports/problems/problems-report.html"
+            echo "📄 Краткое содержимое отчета:"
+            head -100 platforms/android/build/reports/problems/problems-report.html || echo "Не удалось прочитать отчет"
+          else
+            echo "Отчёт не найден"
+          fi 
           
           # Проверка подписи APK для дебаг и релиз версий
           echo "Verifying APK signatures match:"
