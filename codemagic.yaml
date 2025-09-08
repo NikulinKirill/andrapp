@@ -41,7 +41,7 @@ workflows:
       
       - name: Add Android Platform
         script: |
-          cordova platform add android
+          cordova platform add android@latest
       
       - name: Create Signing Configuration
         script: |
