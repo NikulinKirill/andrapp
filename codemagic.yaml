@@ -19,10 +19,9 @@ workflows:
       
       - name: Setup Android SDK
         script: |
-          # Используем глобальный sdkmanager, который совместим с выбранной версией Java
-          # Сначала принимаем все лицензии
-          yes | sdkmanager --licenses
-          yes | sdkmanager "build-tools;35.0.0" "platforms;android-35"
+          # Указываем полный путь к sdkmanager, чтобы избежать ошибок "command not found"
+          yes | $CM_ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+          yes | $CM_ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;35.0.0" "platforms;android-35"
       
       - name: Setup Keystore
         script: |
