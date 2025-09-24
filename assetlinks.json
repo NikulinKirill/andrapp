@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.slivkishop.ru",
+    "sha256_cert_fingerprints":
+    ["33:45:94:94:E8:1E:FE:04:9E:29:A1:BD:BF:53:2F:22:2B:50:2B:78:B9:05:17:7B:2D:7B:91:A6:47:01:75:37"]
+  }
+}]
