@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.slivkishop.ru" version="1.0.0" 
-        android-versionCode="00002" 
+        android-versionCode="2" 
         android-versionName="1.0.0" 
         xmlns="http://www.w3.org/ns/widgets" 
         xmlns:cdv="http://cordova.apache.org/ns/1.0" 
@@ -12,7 +12,7 @@
     <author email="info@dstglobal.ru" href="https://dstglobal.ru">
         DST Global
     </author>
-    <content src="index.html" />
+    <content src="https://slivki-shop.ru" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -21,16 +21,6 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
     
-    <!-- Настройки для сплэш-скрина -->
-    <preference name="SplashScreen" value="screen" />
-    <preference name="SplashScreenDelay" value="3000" />
-    <preference name="FadeSplashScreen" value="true" />
-    <preference name="FadeSplashScreenDuration" value="300" />
-    <preference name="AutoHideSplashScreen" value="true" />
-    <preference name="ShowSplashScreenSpinner" value="false" />
-    <preference name="SplashShowOnlyFirstTime" value="false" />
-    <preference name="SplashScreenSpinnerColor" value="#FFFFFF" />
-
     <!-- Важные настройки для устранения черного фона -->
     <preference name="BackgroundColor" value="#FFFFFF" />
     <preference name="AndroidPersistentFileLocation" value="Internal" />
@@ -42,10 +32,15 @@
         <preference name="LoadUrlTimeoutValue" value="70000" />
         <preference name="AndroidLaunchMode" value="singleTop" />
         
+        <preference name="android-targetSdkVersion" value="35" />
+        <preference name="android-compileSdkVersion" value="35" />
+        
+        <!-- Force a stable version of the Android Gradle Plugin -->
+        
         <!-- Настройки для сплэш-скрина в Android 13 -->
-        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/res/splash/android/splash.png" />
+        <!-- <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/res/splash/android/splash.png" />
         <preference name="AndroidWindowSplashScreenIconBackgroundColor" value="#FFFFFF" />
-        <preference name="AndroidWindowSplashScreenBrandingImage" value="" />
+        <preference name="AndroidWindowSplashScreenBrandingImage" value="" /> -->
         
         <!-- Иконки приложения -->
         <icon density="ldpi" src="www/res/icon/android/icon-36-ldpi.png" />
