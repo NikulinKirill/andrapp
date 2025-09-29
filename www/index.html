@@ -2,7 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline' http://slivki-shop.ru https://slivki-shop.ru; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">    
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline' http://slivki-shop.ru https://slivki-shop.ru; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
     <title>SlivkiShop - маркетплейс оптовых закупок</title>
     <style>
         body {
@@ -94,65 +95,59 @@
         document.addEventListener('deviceready', onDeviceReady, false);
 
         function onDeviceReady() {
-            // Показываем загрузчик
             document.getElementById('loader').style.display = 'flex';
             
-            // Проверка соединения и загрузка контента
             checkConnectionAndLoadContent();
             
-            // Обработка кнопки "назад" на Android
             document.addEventListener('backbutton', handleBackButton, false);
             
-            // Обработчик кнопки повторной попытки
             document.getElementById('retry-button').addEventListener('click', function() {
                 document.getElementById('offline-page').style.display = 'none';
                 document.getElementById('loader').style.display = 'flex';
-                // Проверяем соединение перед попыткой загрузки
+                
                 checkConnectionAndLoadContent();
             });
-
-            // Слушатель события изменения состояния сети
+            
             document.addEventListener("online", function() {
                 if (document.getElementById('offline-page').style.display === 'flex') {
                     document.getElementById('offline-page').style.display = 'none';
-                    document.getElementById('loader').style.display = 'flex';
-                    // Загружаем последний известный URL
+                    document.getElementById('loader').style.display = 'flex';                    
                     loadWebsite(currentUrl);
                 }
             }, false);
 
-            // Слушатель события потери соединения с сетью
+           
             document.addEventListener("offline", function() {
-                // Проверяем, открыт ли браузер
+                
                 if (currentWebView) {
-                    // Закрываем браузер, если он открыт
+                    
                     currentWebView.close();
                     currentWebView = null;
                 }
-                // Показываем оффлайн страницу
+                
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('offline-page').style.display = 'flex';
             }, false);
         }
 
         function checkConnectionAndLoadContent() {
-            // Проверяем наличие соединения
+           
             var networkState = navigator.connection.type;
             var isOffline = networkState === Connection.NONE;
             
             if (isOffline) {
-                // Если нет соединения, показываем оффлайн-страницу
+               
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('offline-page').style.display = 'flex';
             } else {
-                // Есть соединение, пробуем загрузить сайт (сохраняем начальный URL)
+                
                 loadWebsite('https://slivki-shop.ru');
             }
         }
 
         var currentWebView = null;
-        var currentUrl = 'https://slivki-shop.ru'; // Начальный URL по умолчанию
-        var isLoading = false; // Флаг для отслеживания процесса загрузки
+        var currentUrl = 'https://slivki-shop.ru'; 
+        var isLoading = false;
 
         function loadWebsite(url) {
             // Если URL не передан, используем сохраненный или начальный
